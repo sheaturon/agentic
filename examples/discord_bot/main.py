@@ -6,6 +6,7 @@ import os
 from agentic.common import Agent, AgentRunner
 from agentic.models import GPT_4O_MINI
 from src.agentic.runner import RayAgentRunner
+from agentic.tools.utils.registry import Tool, Dependency
 import subprocess
 import traceback
 import sys
@@ -17,11 +18,12 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 MODEL = GPT_4O_MINI
 
 # Add the missing functions from golf_agent.py
-def execute_command(command):
+def execute_command(command: dict):
     """Execute a shell command and return its output."""
     try:
-        print(f"Running command: {command}")
-        result = subprocess.run(command, shell=True, text=True, capture_output=True)
+        command_str = command.get("command", "")
+        print(f"Running command: {command_str}")
+        result = subprocess.run(command_str, shell=True, text=True, capture_output=True)
         
         if result.returncode == 0:
             return result.stdout
@@ -150,18 +152,7 @@ async def golf(ctx, *, prompt):
                 "You are also a discord bot which only is allowed to respond with 2000 characters or less so make sure your responses to all questions are succinct and to the point."
             ],
             model=GPT_4O_MINI,
-            tools=[
-                {
-                    "name": "execute_command",
-                    "description": "Execute a shell command and return its output",
-                    "function": execute_command
-                },
-                {
-                    "name": "read_file",
-                    "description": "Read a file and return its contents",
-                    "function": read_file
-                }
-            ],
+            tools=[read_file, execute_command],
         )
         
         # Create a RayAgentRunner for the agent
