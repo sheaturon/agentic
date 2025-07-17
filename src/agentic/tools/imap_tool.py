@@ -108,7 +108,7 @@ to learn how to create an app password. You need to supply this password to use 
         self.app_password = thread_context.get_secret("IMAP_PASSWORD")
         imap = None
         try:
-            imap = imaplib.IMAP4_SSL("imap.gmail.com", 993)
+            imap = imaplib.IMAP4_SSL(thread_context.get_secret("IMAP_SERVER"), thread_context.get_secret("IMAP_PORT"))
             imap.login(self.email_address, self.app_password)
 
             _, folders = imap.list()
@@ -149,7 +149,7 @@ to learn how to create an app password. You need to supply this password to use 
         self.email_address = thread_context.get_secret("IMAP_USERNAME")
         self.app_password = thread_context.get_secret("IMAP_PASSWORD")
         imap_server = "imap.gmail.com"
-        imap_port = 993
+        imap_port = thread_context.get_secret("IMAP_PORT")
 
         thread_context.info(f"Starting to list emails with limit={limit}")
 
@@ -337,7 +337,7 @@ to learn how to create an app password. You need to supply this password to use 
         msg.attach(MIMEText(body, "plain"))
 
         try:
-            imap = imaplib.IMAP4_SSL("imap.gmail.com", 993)
+            imap = imaplib.IMAP4_SSL(thread_context.get_secret("IMAP_SERVER"), thread_context.get_secret("IMAP_PORT"))
             imap.login(self.email_address, self.app_password)
 
             imap.select('"[Gmail]/Drafts"')  # for Gmail
@@ -485,8 +485,8 @@ to learn how to create an app password. You need to supply this password to use 
 
         self.email_address = thread_context.get_secret("IMAP_USERNAME")
         self.app_password = thread_context.get_secret("IMAP_PASSWORD")
-        imap_server = "imap.gmail.com"
-        imap_port = 993
+        imap_server = thread_context.get_secret("IMAP_SERVER")
+        imap_port = thread_context.get_secret("IMAP_PORT")
 
         # Handle since_date conversion
         if since_date:
@@ -911,8 +911,8 @@ to learn how to create an app password. You need to supply this password to use 
             email_address = secrets["email_address"]
             app_password = secrets["app_password"]
             # Attempt to establish a connection to the IMAP server
-            imap_server = "imap.gmail.com"
-            imap_port = 993
+            imap_server = thread_context.get_secret("IMAP_SERVER")
+            imap_port = thread_context.get_secret("IMAP_PORT")
             with imaplib.IMAP4_SSL(imap_server, imap_port) as imap:
                 imap.login(email_address, app_password)
                 imap.select("inbox", readonly=True)
